@@ -1,0 +1,97 @@
+[
+  {
+    "app": "cs_CZ",
+    "docs": "cs",
+    "name": "Czech"
+  },
+  {
+    "app": "de_DE",
+    "docs": "de",
+    "name": "German"
+  },
+  {
+    "app": "en_US",
+    "docs": "en",
+    "name": "English"
+  },
+  {
+    "app": "es_ES",
+    "docs": "es",
+    "name": "Spanish"
+  },
+  {
+    "app": "fr_FR",
+    "docs": "fr",
+    "name": "French"
+  },
+  {
+    "app": "hi_IN",
+    "docs": "hi",
+    "name": "Hindi"
+  },
+  {
+    "app": "hu_HU",
+    "docs": "hu",
+    "name": "Hungarian"
+  },
+  {
+    "app": "it_IT",
+    "docs": "it",
+    "name": "Italian"
+  },
+  {
+    "app": "ja_JP",
+    "docs": "ja",
+    "name": "Japanese"
+  },
+  {
+    "app": "nb_NO",
+    "docs": "nb",
+    "name": "Norwegian Bokmål"
+  },
+  {
+    "app": "nl_NL",
+    "docs": "nl",
+    "name": "Dutch"
+  },
+  {
+    "app": "pl_PL",
+    "docs": "pl",
+    "name": "Polish"
+  },
+  {
+    "app": "pt_BR",
+    "docs": "pt-BR",
+    "name": "Portuguese (Brazil)"
+  },
+  {
+    "app": "ro_RO",
+    "docs": "ro",
+    "name": "Romanian"
+  },
+  {
+    "app": "ru_RU",
+    "docs": "ru",
+    "name": "Russian"
+  },
+  {
+    "app": "sv_SE",
+    "docs": "sv",
+    "name": "Swedish"
+  },
+  {
+    "app": "tr_TR",
+    "docs": "tr",
+    "name": "Turkish"
+  },
+  {
+    "app": "vi_VN",
+    "docs": "vi",
+    "name": "Vietnamese"
+  },
+  {
+    "app": "zh_CN",
+    "docs": "zh-CN",
+    "name": "Chinese (Simplified)"
+  }
+]

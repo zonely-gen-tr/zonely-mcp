@@ -1,0 +1,29 @@
+{
+  "name": "@zonely/mcp",
+  "version": "1.0.0",
+  "description": "Zonely site management for local MCP clients",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "bin": {
+    "zonely-mcp": "src/cli.mjs"
+  },
+  "files": [
+    "src/",
+    "vendor/",
+    "data/",
+    "scripts/setup-engine.py",
+    "requirements.txt"
+  ],
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.32.2",
+    "express": "5.1.0",
+    "playwright": "1.63.0",
+    "sharp": "0.35.5",
+    "ssh2": "1.17.0",
+    "ssh2-sftp-client": "12.1.1",
+    "zod": "4.6.7"
+  }
+}

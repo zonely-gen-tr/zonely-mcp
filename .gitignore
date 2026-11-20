@@ -1,0 +1,11 @@
+node_modules/
+runtime/
+.venv/
+__pycache__/
+config.local.json
+connection.json
+.env*
+*.dpapi
+*.sqlite*
+*.log
+*.tgz
