@@ -60,7 +60,9 @@ API ile SFTP hazırlamak için aynı kurulumda `--sftp-fingerprint` ile hosting 
 
 Codex, kurulumda seçtiğiniz dili ve Zonely dokümantasyonunu kullanır. “Zonely rehber dilini İngilizce yap” gibi bir istek, açık MCP oturumundaki dili değiştirir. Kalıcı seçim için `setup` komutunu aynı site ve yeni dil ile yeniden çalıştırın.
 
-`zonely-mcp check-update` planlanan `zonely-gen-tr/zonely-mcp` GitHub deposunun son kararlı sürümüne bakar. Yayın bulunmazsa `unpublished` döner. Yeni sürüm çıktığında sürüm sayfasını gösterir. İndirdiğiniz yeni sürüm klasöründe `npm install -g .` komutunu yeniden çalıştırın.
+`1.0.2` ve sonrası, bir oturumdaki ilk MCP işlemi sırasında resmî GitHub sürümünü arka planda kontrol eder. Doğrulanan güncelleme sonraki MCP bağlantısında devreye girer. Devam eden işler ve sohbet aynı oturumda sürer.
+
+Önceki sürümlerden geçerken güncel ZIP’i bir kez kurun. Kurulum dizini değişirse MCP istemcisindeki kayıt yolunu güncelleyin. İsteğe bağlı olarak istemci ortamında `ZONELY_AUTO_UPDATE=0` ayarıyla otomatik güncelleme kapatılabilir. `zonely-mcp check-update` ile elle kontrol yapılabilir.
 
 Argos ve PaddleOCR isteğe bağlıdır. Python 3.12 ortamına `python -m pip install -r requirements.txt` ile bağımlılıkları kurup `python scripts/setup-engine.py --install-models --install-ocr` ile modelleri hazırlayabilirsiniz. `ZONELY_PYTHON` ile o ortamın Python yolunu seçin. Rehber dilleri, yerelde kurulu çeviri ve OCR modellerinden bağımsızdır.
 

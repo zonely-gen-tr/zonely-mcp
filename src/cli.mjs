@@ -4,11 +4,12 @@ import path from 'node:path';
 import {spawnSync} from 'node:child_process';
 import {createInterface} from 'node:readline/promises';
 import {parseArgs} from 'node:util';
-import {fileURLToPath} from 'node:url';
+import {fileURLToPath, pathToFileURL} from 'node:url';
 import {config, base, settingsDirectory, settingsPath} from './config.mjs';
 import {protectCredential, unlockCredential} from './credential.mjs';
 import {documentationLanguage, documentationLanguages} from './documentation.mjs';
 import {checkUpdate, version} from './version.mjs';
+import {automaticUpdatesEnabled, installedUpdate} from './auto-update.mjs';
 
 const [action = 'serve', ...args] = process.argv.slice(2);
 
@@ -68,13 +69,20 @@ async function setup() {
 }
 
 async function main() {
+  if (automaticUpdatesEnabled() && ['serve', '--version', 'check-update'].includes(action)) {
+    const update = installedUpdate();
+    if (update) {
+      try { return await import(pathToFileURL(update.launcher).href); }
+      catch { /* Continue with the original launcher if the staged entry cannot be loaded. */ }
+    }
+  }
   switch (action) {
     case 'setup': return setup();
     case 'languages': return console.log(documentationLanguages().map(({code, name}) => `${code}\t${name}`).join('\n'));
     case 'codex-config': {
       const launcher = fileURLToPath(import.meta.url).replaceAll('\\', '/');
       const node = process.execPath.replaceAll('\\', '/');
-      const env = ['ZONELY_SITE_API_KEY', 'ZONELY_CONFIG_DIR', 'ZONELY_PYTHON'];
+      const env = ['ZONELY_SITE_API_KEY', 'ZONELY_CONFIG_DIR', 'ZONELY_PYTHON', 'ZONELY_AUTO_UPDATE'];
       return console.log(`[mcp_servers.zonely]\ncommand = ${JSON.stringify(node)}\nargs = [${JSON.stringify(launcher)}, "serve"]\nenv_vars = ${JSON.stringify(env)}\ntool_timeout_sec = 120`);
     }
     case 'mcp-config': {

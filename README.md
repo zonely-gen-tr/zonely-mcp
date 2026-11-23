@@ -27,6 +27,8 @@ The release includes background batch setup and a module installer with dedicate
 
 The package also includes local MCP setup instructions for Claude Code and other clients that support local stdio servers.
 
+Starting with v1.0.2, the first MCP operation checks the official release in the background. Verified updates activate on the next MCP connection. Install v1.0.2 once to enable updates from an older installation.
+
 ### Starting a new site
 
 Ask for a trial preview for a domain you control. Sign in to your Zonely account and confirm the domain and the zero total before applying. The account's DNS guide then shows how to connect your domain. Once your site is ready, link it to your assistant.
