@@ -17,7 +17,7 @@ Connect your Zonely control panel to an AI assistant. Manage site content, store
 | **PHP modules** | Read Zonely's module rules, develop a PHP module and its templates, and prepare a ZIP for panel validation. Build a companion game-server plugin when the feature needs one. |
 | **Documentation and database guidance** | Find panel workflows in 19 documentation languages, including guides for database administration in phpMyAdmin. |
 
-The release exposes 48 MCP tools. Available actions depend on your site version, enabled features, connected integrations, and account permissions. Run phpMyAdmin database operations in your hosting panel.
+The release includes background batch setup and a module installer with dedicated admin route and sidebar verification. Available actions depend on your site version, enabled features, connected integrations, and account permissions. Run phpMyAdmin database operations in your hosting panel.
 
 ## Installation
 

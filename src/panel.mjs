@@ -74,6 +74,15 @@ const recipes = {
     fields:[{name:'addon',type:'string'}]
   },
   'store.product.minecraft.create': minecraftProductRecipe,
+  'role.cosmetic.create': {
+    title:'Roller → Görünüm rolü ekle',
+    pageId:'panel:site:page:main.permissions',
+    open:['#drawer_perms_add_button'],
+    form:'#permsForm',operationId:'perms-permsaddcontroller',cosmeticRole:true,
+    documentation:['/guides/permissions'],fields:[{name:'name',type:'text',required:true},
+      {name:'color',type:'text',description:'Prefix color as #RRGGBB'},
+      {name:'style',type:'select',description:'solid, soft, outline or gradient'}]
+  },
   'store.category.create': {
     title: 'Mağaza → Kategoriler → Kategori ekle',
     pageId: 'panel:site:page:main.shop',
@@ -521,6 +530,48 @@ export class Panel {
       fields=await prepareAppealQuestions(form,fields);
     }
     if(gameProduct)await prepareMinecraftProduct(page,gameProduct.offers.length);
+    let cosmeticRoleName, cosmeticAppearanceRequested=false;
+    if(recipe.cosmeticRole){
+      cosmeticRoleName=typeof fields.name==='string'?fields.name.trim():'';
+      const {color,style}=fields;
+      cosmeticAppearanceRequested=color!==undefined||style!==undefined;
+      const styles={solid:'#pfxSolid',soft:'#pfxSoft',outline:'#pfxOutline',gradient:'#pfxGradient'};
+      if(!cosmeticRoleName||cosmeticRoleName.length>60||/[<>\r\n]/.test(cosmeticRoleName)||
+        Object.keys(fields).some(key=>!['name','color','style'].includes(key))||
+        (color!==undefined&&(typeof color!=='string'||!/^#[0-9a-f]{6}$/i.test(color)))||
+        (style!==undefined&&(typeof style!=='string'||!Object.hasOwn(styles,style)))||files.length||envFields.length)
+        throw Error('Supply a display name, optional hex color and optional prefix style for a cosmetic role');
+      if(await page.getByText(cosmeticRoleName,{exact:true}).filter({visible:true}).count()){
+        if(cosmeticAppearanceRequested&&mode==='apply')throw Error('This role already exists; use the role editor to change its appearance');
+        return {submitted:false,mode,existing:true,verified:!cosmeticAppearanceRequested};
+      }
+      fields={};
+      const label=form.locator('#pfxPreview[contenteditable="true"]');
+      await label.fill(cosmeticRoleName,{timeout:8000});
+      await label.press('Tab');
+      if((await label.textContent())?.trim()!==cosmeticRoleName)
+        throw Error('The role name was not retained by the panel');
+      if(color){
+        const picker=form.locator('#pfxColor');
+        await picker.evaluate((input,value)=>{
+          input.value=value;
+          input.dispatchEvent(new Event('input',{bubbles:true}));
+          input.dispatchEvent(new Event('change',{bubbles:true}));
+        },color);
+        if((await picker.inputValue()).toLowerCase()!==color.toLowerCase())
+          throw Error('The role color was not retained by the panel');
+      }
+      if(style){
+        const radio=form.locator(styles[style]);
+        await radio.evaluate(input=>input.click());
+        if(!await radio.isChecked())throw Error('The role style was not retained by the panel');
+      }
+      if(cosmeticAppearanceRequested){
+        const serialized=JSON.parse(await form.locator('#prefix_opts').inputValue());
+        if(serialized.text!==cosmeticRoleName||(color&&serialized.color?.toLowerCase()!==color.toLowerCase())||
+          (style&&serialized.style!==style))throw Error('The panel did not prepare the requested role appearance');
+      }
+    }
     const controls = await formControls(form);
     const names = [...Object.keys(fields), ...files.map(f => f.field), ...envFields.map(f => f.field)];
     if((recipe.drawerId||recipe.requiresRecord)&&names.includes('id'))throw Error('The workflow record identity comes from recordId');
@@ -601,6 +652,16 @@ export class Panel {
       verification=matching?.length===1&&matching[0].identical
         ? {verified:true,record:matching[0].record}
         : {verified:false,hint:'The panel accepted the game product. Verify the saved item before retrying.'};
+    }
+    if(cosmeticRoleName){
+      await this.navigate(recipe.pageId);
+      try{
+        await page.getByText(cosmeticRoleName,{exact:true}).filter({visible:true}).first().waitFor({state:'visible',timeout:10000});
+        verification={verified:!cosmeticAppearanceRequested,record:{name:cosmeticRoleName},
+          ...(cosmeticAppearanceRequested?{hint:'The saved role name was verified; verify its appearance in the role editor.'}:{})};
+      }catch{
+        verification={verified:false,hint:'The panel accepted the role. Check the role list before retrying.'};
+      }
     }
     if(workflowId==='form:main.news:broadcastsForm'&&verification.record?.id)
       verification=await verifyAnnouncementEdit(page,this.origin(),{id:verification.record.id},values,files,{create:true});

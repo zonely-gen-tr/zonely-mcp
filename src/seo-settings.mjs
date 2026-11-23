@@ -66,12 +66,14 @@ export async function verifyPublicSeo(panel,input){
   const publicResponse=await panel.context.request.get(panel.origin()+'/',{timeout:10000});
   if(!publicResponse.ok())throw Error('SEO saved but public readback is unavailable');
   const html=await publicResponse.text();
-  if(html.length>2*1024*1024)throw Error('Public SEO readback exceeds the output budget');
+  const headEnd=html.slice(0,2*1024*1024).search(/<\/head\s*>/i);
+  if(headEnd<0)throw Error('Public SEO head is missing or exceeds the readback budget');
+  const headHtml=html.slice(0,headEnd);
   const head=await page.evaluate(html=>{
     const document=new DOMParser().parseFromString(html,'text/html');
     return {title:document.title,description:document.querySelector('meta[name="description"]')?.content,
       favicon:document.querySelector('link[rel~="icon"]')?.getAttribute('href')};
-  },html);
+  },headHtml);
   if(input.title&&!head.title.includes(input.title))throw Error('SEO saved but the public title differs: '+head.title);
   if(input.suffix&&!head.title.endsWith(' • '+input.suffix))throw Error('SEO title suffix did not read back');
   if(input.description!==undefined&&head.description!==input.description)throw Error('SEO description did not read back');
@@ -129,7 +131,6 @@ export async function applyPageBuilderSettings(panel,fields){
 }
 
 async function withBuilderWrites(panel,actions,callback){
-  const page=panel.page;
   const operation=panel.catalog.find(item=>item.id==='settings-generalsettingsupdatecontroller');
   if(!operation)throw Error('Missing native PageBuilder save target');
   const matches=(request,operation)=>{
@@ -139,22 +140,20 @@ async function withBuilderWrites(panel,actions,callback){
       &&actions.includes(url.searchParams.get('action'));
   };
   const blocked=[];
-  const guard=async route=>{
-    const request=route.request();
-    if(['GET','HEAD'].includes(request.method())||matches(request,operation))return route.fallback();
+  if(panel.addonWrite)throw Error('Another native panel write is already active');
+  const guard=request=>{
+    if(matches(request,operation))return true;
     const url=new URL(request.url());
     blocked.push({path:url.pathname,main:url.searchParams.get('main'),container:url.searchParams.get('container')});
-    return route.abort();
+    return false;
   };
-  await page.route('**/*',guard);
-  panel.allowWrites=true;panel.expectedPost=null;
+  panel.addonWrite=guard;
   try{
     return await callback();
   }catch(error){
     throw Error(error.message+(blocked.length?'; blocked unexpected routes: '+JSON.stringify(blocked):''));
   }finally{
-    panel.allowWrites=false;panel.expectedPost=null;
-    await page.unroute('**/*',guard);
+    panel.addonWrite=null;
   }
 }
 

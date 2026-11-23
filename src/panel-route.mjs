@@ -16,7 +16,7 @@ export const routeRecipes=Object.fromEntries(['create','alias','edit','delete','
   verification:'Native route filter response and independent navigation catalog readback'
 }]));
 
-async function readCatalog(page,origin){
+export async function readCatalog(page,origin){
   return page.evaluate(async ({origin,endpoint})=>{
     const url=new URL(endpoint,origin);url.searchParams.set('action','catalog');
     const response=await fetch(url,{credentials:'same-origin',redirect:'error',signal:AbortSignal.timeout(12000)});

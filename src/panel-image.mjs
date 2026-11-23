@@ -6,50 +6,37 @@ export async function panelImageLink(panel, slug) {
   if (typeof slug !== 'string' || slug.length > 120 || !imageSlugPattern.test(slug))
     throw Error('Supply the exact image slug from Image Management');
   const page = await panel.navigate('panel:site:page:main.images');
-  await page.waitForFunction(() => window.jQuery?.fn?.dataTable?.isDataTable('#imagesTable'));
-  const selected = await page.evaluate(async slug => {
-    const tableElement = window.jQuery('#imagesTable');
-    const table = tableElement.DataTable();
-    const input = document.getElementById('imagesSearch');
-    if (!input) throw Error('Image Management search is unavailable');
-    const draw = new Promise((resolve, reject) => {
-      const timer = setTimeout(() => {
-        tableElement.off('draw.dt.zonelyImageLink', afterDraw);
-        reject(Error('Image Management search did not finish'));
-      }, 12000);
-      function afterDraw() {
-        clearTimeout(timer);
-        resolve();
-      }
-      tableElement.one('draw.dt.zonelyImageLink', afterDraw);
-    });
-    input.value = slug;
-    table.search(slug).draw();
-    await draw;
-    const info = table.page.info();
-    if (!Number.isInteger(info.recordsDisplay) || info.recordsDisplay > info.length)
-      return {ambiguous:true};
-    const matches = [];
-    table.rows({page:'current'}).every(function () {
-      const item = this.data();
-      const filename = String(item?.file_name ?? '');
-      const fileSlug = filename.replace(/\.[a-z0-9]+$/i, '');
-      if ((item?.slug || fileSlug) !== slug) return;
-      const link = this.node()?.querySelector('a:has(img.image-library-thumb)');
-      matches.push({id:Number(item.id), name:String(item.name ?? filename).slice(0,255),
-        url:item.image_url ?? null, href:link?.getAttribute('href') ?? null});
-    });
-    return {matches};
-  }, slug).catch(() => { throw Error('Could not read the Image Management table'); });
-  if (selected.ambiguous || selected.matches.length > 1) throw Error('Image Management returned an ambiguous match');
-  if (selected.matches.length !== 1) throw Error('Image was not found in Image Management');
-  const row = selected.matches[0];
-  if (!Number.isSafeInteger(row.id) || row.id <= 0 || !row.url || !row.href)
-    throw Error('Image Management did not provide a published link');
+  const search = page.locator('#imagesSearch');
+  await search.waitFor({state:'attached',timeout:8000});
+  await search.evaluate((element,value)=>{
+    element.value=value;
+    element.dispatchEvent(new Event('input',{bubbles:true}));
+    element.dispatchEvent(new Event('keyup',{bubbles:true}));
+  },slug);
+  const rendered = await page.waitForFunction(slug=>{
+    const rows=document.querySelectorAll('#imagesTable tbody tr');
+    const matches=[];
+    for(const row of rows){
+      const links=[...row.querySelectorAll('a[href]')].filter(link=>{
+        const url=new URL(link.href,location.href);
+        return url.origin===location.origin && url.pathname.startsWith('/Files/Assets/img/uploads/') &&
+          url.pathname.split('/').at(-1)?.replace(/\.[a-z0-9]+$/i,'')===slug;
+      });
+      if(!links.length)continue;
+      const urls=[...new Set(links.map(link=>link.href))];
+      const thumbnail=links.find(link=>link.querySelector('img'));
+      const id=Number(row.dataset.id??row.querySelector('input[type="checkbox"]')?.value);
+      const name=thumbnail?.querySelector('img')?.alt || thumbnail?.title || slug;
+      matches.push({id:Number.isSafeInteger(id)&&id>0?id:null,name:name.slice(0,255),urls});
+    }
+    return matches.length?matches:false;
+  },slug,{timeout:12000}).catch(()=>{throw Error('Image was not found in the rendered Image Management table');});
+  const matches=await rendered.jsonValue();
+  if(matches.length!==1||matches[0].urls.length!==1)throw Error('Image Management returned an ambiguous match');
+  const row=matches[0];
   const origin = panel.origin();
-  const url = new URL(row.url, origin);
-  if (url.origin !== origin || url.username || url.password || url.hash ||
-      new URL(row.href, origin).href !== url.href)
+  const url = new URL(row.urls[0]);
+  if (url.origin !== origin || url.username || url.password || url.hash)
     throw Error('Image Management returned an unexpected link');
   const visitor = await request.newContext();
   try {
@@ -61,5 +48,5 @@ export async function panelImageLink(panel, slug) {
   } finally {
     await visitor.dispose();
   }
-  return {id:row.id, name:row.name, slug, url:url.href, verified:true};
+  return {...(row.id===null?{}:{id:row.id}), name:row.name, slug, url:url.href, verified:true};
 }
