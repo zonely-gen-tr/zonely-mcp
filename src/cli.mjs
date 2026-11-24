@@ -82,7 +82,7 @@ async function main() {
     case 'codex-config': {
       const launcher = fileURLToPath(import.meta.url).replaceAll('\\', '/');
       const node = process.execPath.replaceAll('\\', '/');
-      const env = ['ZONELY_SITE_API_KEY', 'ZONELY_CONFIG_DIR', 'ZONELY_PYTHON', 'ZONELY_AUTO_UPDATE'];
+      const env = ['ZONELY_SITE_API_KEY', 'ZONELY_CONFIG_DIR', 'ZONELY_PYTHON', 'ZONELY_AUTO_UPDATE', 'ZONELY_DIAGNOSTICS'];
       return console.log(`[mcp_servers.zonely]\ncommand = ${JSON.stringify(node)}\nargs = [${JSON.stringify(launcher)}, "serve"]\nenv_vars = ${JSON.stringify(env)}\ntool_timeout_sec = 120`);
     }
     case 'mcp-config': {

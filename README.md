@@ -49,6 +49,8 @@ Ask for a trial preview for a domain you control. Sign in to your Zonely account
 
 ## Help and documentation
 
+Starting in v1.0.3, set `ZONELY_DIAGNOSTICS=1` in the MCP server environment to share operation failures and slow calls with Zonely. Reports contain the MCP version, tool name, and a fixed diagnostic code. The feature is off by default and runs in the background when enabled.
+
 Use the official [Zonely documentation](https://docs.zonely.gen.tr/) for platform guides. See the [setup guide](SETUP.tr.md) for client configuration and site connection instructions.
 
 ## Source and license

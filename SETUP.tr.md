@@ -66,6 +66,12 @@ Codex, kurulumda seçtiğiniz dili ve Zonely dokümantasyonunu kullanır. “Zon
 
 Argos ve PaddleOCR isteğe bağlıdır. Python 3.12 ortamına `python -m pip install -r requirements.txt` ile bağımlılıkları kurup `python scripts/setup-engine.py --install-models --install-ocr` ile modelleri hazırlayabilirsiniz. `ZONELY_PYTHON` ile o ortamın Python yolunu seçin. Rehber dilleri, yerelde kurulu çeviri ve OCR modellerinden bağımsızdır.
 
+## İsteğe bağlı hata bildirimi
+
+MCP 1.0.3 ve sonrasında hata bildirimi başlangıçta kapalıdır. Paylaşmak istiyorsanız MCP istemcisinin sunucu ortamına `ZONELY_DIAGNOSTICS=1` ekleyin ve bağlantıyı yeniden başlatın. `zonely_status` üzerinden ayarın etkinliğini görebilirsiniz. Kapatmak için değişkeni kaldırın veya `0` yapın.
+
+Bildirimler Zonely’nin HTTPS alıcısına arka planda gönderilir. Alanlar protokol sürümü, MCP sürümü, araç adı ve sabit hata koduyla sınırlıdır. Site adresi, kullanıcı adı, giriş bilgileri, sohbet, dosya, girdi ve ham hata metni gönderilmez. Tekrarlanan bildirimler sınırlandırılır. Sunucu, operasyon takibi için rapora UTC dakikasını ekler.
+
 ## Panel kapsamı
 
 Paket Zonely'nin 150 rehberini, kayıtlı panel akışlarını ve mevcut API kataloğunu kullanır. Bir işlemin listelenmesi kayıt testinin geçtiği anlamına gelmez. Örneğin Google sağlayıcı anahtarının kaydı ve geri okunması doğrulandı. Google ile giriş, sağlayıcı anahtarlarıyla ayrıca doğrulanmalıdır. Sitenin sürümü, kurulu eklentiler ve kullanıcının yetkileri kullanılabilecek işlemleri belirler.

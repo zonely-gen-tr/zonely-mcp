@@ -1,6 +1,6 @@
 {
   "name": "@zonely/mcp",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Zonely site management for local MCP clients",
   "private": true,
   "type": "module",

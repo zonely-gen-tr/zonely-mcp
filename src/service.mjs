@@ -140,7 +140,7 @@ export class Service {
     this.queue=this.queue.then(async()=>{
       this.store.db.prepare("UPDATE jobs SET state='running',updated_at=? WHERE id=?").run(now(),id);
       try{
-        const result=await work(id);
+        const result=await (this.observeJob ? this.observeJob(kind,()=>work(id)) : work(id));
         this.store.db.prepare("UPDATE jobs SET state='completed',progress=total,result=?,updated_at=? WHERE id=?").run(JSON.stringify(result),now(),id);
         this.store.audit(kind,id,{state:'completed'});
       }catch(error){

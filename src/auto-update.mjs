@@ -113,7 +113,7 @@ async function checkAndPrepare(directory, current, fetcher, prepare) {
 }
 
 export function createAutoUpdater({directory = root(), current = version, fetcher = fetch,
-  prepare = prepareRelease, now = Date.now} = {}) {
+  prepare = prepareRelease, now = Date.now, onFailure = () => {}} = {}) {
   let nextCheck = 0;
   let ready;
   return {
@@ -122,7 +122,7 @@ export function createAutoUpdater({directory = root(), current = version, fetche
       nextCheck = now() + checkInterval;
       void checkAndPrepare(directory, current, fetcher, prepare)
         .then(update => { if (update) ready = update.version; })
-        .catch(() => {});
+        .catch(() => { onFailure(); });
     },
     status() {
       return ready ? {status: 'ready-on-reconnect', version: ready} : undefined;
