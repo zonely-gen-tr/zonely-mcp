@@ -39,6 +39,7 @@ const toolTitles = {
   "trial_apply": "Claim the approved free trial",
   "trial_status": "Check the domain’s license and DNS step",
   "theme_create": "Create an inactive site theme",
+  "theme_capture_previews": "Capture and save theme card images",
   "theme_draft_read": "Read a private draft template",
   "theme_draft_patch": "Edit a private draft template",
   "panel_inspect": "Inspect panel fields",

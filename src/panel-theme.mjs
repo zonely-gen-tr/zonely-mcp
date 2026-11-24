@@ -1,6 +1,7 @@
 import * as z from 'zod/v4';
 import {matchesPost} from './panel-request.mjs';
 import {validateText} from './sftp.mjs';
+import {captureThemePreviews} from './panel-theme-previews.mjs';
 
 const themesPage = 'panel:site:page:main.selector-theme';
 const cards = 'article.theme-card[data-theme-id][data-theme-name]';
@@ -135,6 +136,9 @@ export function patchPanelTheme(panel, {theme, file, expectedHash, find, replace
 }
 
 export function registerThemePanelTools(tool, panel) {
+  tool('zonely_theme_capture_previews', 'Capture the public homepage of the active private theme in light and dark. Apply saves both images to its theme card and verifies the files served by the panel.',
+    {theme: z.string().regex(themeIdPattern), mode: z.enum(['preview', 'apply']).default('preview')},
+    args => captureThemePreviews(panel, args), false, true);
   tool('zonely_theme_create', 'Create a separate inactive theme based on Default through the signed-in Themes panel. Preview checks the name. Apply verifies the new theme and the active selection after saving. Use apply when requested.',
     {name: z.string().min(3).max(60), mode: z.enum(['preview', 'apply']).default('preview')},
     args => createPanelTheme(panel, args.name, args.mode), false, true);

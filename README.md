@@ -37,6 +37,10 @@ Ask for a trial preview for a domain you control. Sign in to your Zonely account
 
 > Create a private BoxPvP theme draft. Add an arena introduction and feature existing store products on the homepage.
 
+> Capture the live homepage in light and dark, then save both screenshots to the card for my active private theme.
+
+`zonely_theme_capture_previews` uses the public homepage and the signed-in Themes panel. Use `mode: "preview"` to check that both views render, or `mode: "apply"` to save and verify the two card images. The theme must be active, private, and managed by the connected site.
+
 > Upload this image to the media library, verify its published link, and use it on my game card.
 
 > Check the module development guide. Design a player-activity map with a PHP module, a database, and a companion game-server plugin.
